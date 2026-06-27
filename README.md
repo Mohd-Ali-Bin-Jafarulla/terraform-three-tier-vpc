@@ -4,6 +4,7 @@
 This repository contains a modular, production-ready, and fully parameterized Terraform configuration that provisions a secure, highly available **Three-Tier Infrastructure** on AWS. 
 
 The entire project is structured using a **Parent-Child Module Model** where no values are hardcoded in the infrastructure resource blocks. To ensure compliance with enterprise engineering standards, all environment-specific values flow directly from the parent configuration down to isolated infrastructure components.
+
 ---
 ### 🏗️ Architecture Design
 The infrastructure is engineered across **two Availability Zones (AZs)** to ensure fault tolerance and high availability while remaining fully compliant within the **AWS Free Tier**:
@@ -54,6 +55,7 @@ terraform-three-tier-vpc/
 ---
 ### 🛠️ Step 1: Detailed Explanation of Root (Parent) Files
 At the root level, these files act as the project manager. They don't create specific resources like EC2 instances directly—instead, they take your settings, configure the connection to AWS, and pass values down to the child modules.
+
 ---
 ### 1️⃣ `providers.tf` (The Cloud Connector):
 
@@ -228,6 +230,7 @@ output "application_url" {
 ----
 ### 📦 Step 2: Detailed Explanation of the VPC Module `(modules/vpc/)`
 This module is responsible for carving out your private, isolated network chunk in the AWS cloud and splitting it into distinct zones.
+
 ---
 ### 1️⃣ `Main.tf` (VPC Child Module):
 ```hcl
@@ -402,6 +405,7 @@ output "db_subnet_ids" {
 ### 📦 Step 3: Detailed Explanation of the Security Groups Module `(modules/security_groups/)`:
 
 Instead of using IP address ranges (CIDR blocks) to restrict access, this module uses Security Group Chaining (referencing one security group ID inside another). This is an industry-standard security practice.
+
 ---
 ### 1️⃣ `Main.tf`(Security Groups Child Module):
 ```hcl
@@ -550,8 +554,8 @@ output "db_sg_id" {
 - _Why we use it: When we build our EC2 instances and our RDS database later, AWS needs us to attach these specific firewalls to them. By exporting these IDs, the parent module can catch them and hand them off directly to the Compute and Database modules._
 
 ### 📦 Step 4: Detailed Explanation of the Database Module `(modules/database/)`:
-
 This module groups your isolated private database subnets together and provisions an RDS database instance directly inside them.
+
 ---
 ### 1️⃣ `Main.tf`(Database Child Module):
 ```hcl
@@ -671,8 +675,8 @@ output "db_endpoint" {
 - _Why we use it: When AWS provisions an RDS instance, it generates a unique backend endpoint string (e.g., three-tier-db.c123456789.us-east-1.rds.amazonaws.com:5432). Your application servers in the compute layer require this exact address to send data queries. Exporting this string allows the parent layer to capture it and pass it along to your application logic._
 
 ### 📦 Step 5: Detailed Explanation of the Compute Module `(modules/compute/)`:
-
 This module uses dynamic data to grab the latest OS image, sets up a public-facing entry point, and connects an automated installation script to your application layer.
+
 ---
 ### 1️⃣ `Main.tf`(Compute Child Module):
 ```hcl
